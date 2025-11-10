@@ -3,23 +3,88 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Play, ExternalLink, Zap } from "lucide-react"
+import { Play, ExternalLink, Zap, CheckCircle2, XCircle, Loader2 } from "lucide-react"
+
+interface ApiEndpoint {
+  path: string
+  method: string
+  description: string
+  category: string
+}
+
+const API_ENDPOINTS: ApiEndpoint[] = [
+  { path: "/express", method: "GET", description: "测试 Express 根路由", category: "基础" },
+  { path: "/express/users/123/test", method: "GET", description: "测试路由参数", category: "基础" },
+  { path: "/express/context", method: "GET", description: "测试 Context 上下文", category: "基础" },
+  { path: "/express/argon2", method: "GET", description: "测试 Argon2 密码哈希", category: "加密" },
+  { path: "/express/bcrypt", method: "GET", description: "测试 Bcrypt 密码哈希", category: "加密" },
+  { path: "/express/sqlite3", method: "GET", description: "测试 SQLite3 数据库", category: "数据库" },
+  { path: "/express/better-sqlite3", method: "GET", description: "测试 Better-SQLite3", category: "数据库" },
+  { path: "/express/pg-native", method: "GET", description: "测试 PostgreSQL Native", category: "数据库" },
+  { path: "/express/skia-canvas", method: "GET", description: "测试 Skia Canvas 图像生成", category: "图像处理" },
+  { path: "/express/sharp", method: "GET", description: "测试 Sharp 图像处理", category: "图像处理" },
+  { path: "/express/ffmpeg-static", method: "GET", description: "测试 FFmpeg 视频处理", category: "媒体处理" },
+  { path: "/express/onnxruntime", method: "GET", description: "测试 ONNX Runtime 机器学习", category: "AI/ML" },
+  { path: "/express/winknlp", method: "GET", description: "测试 WinkNLP 自然语言处理", category: "AI/ML" },
+  { path: "/express/tensorflow", method: "GET", description: "测试 TensorFlow.js", category: "AI/ML" },
+  { path: "/express/puppeteer", method: "GET", description: "测试 Puppeteer 浏览器自动化", category: "浏览器" },
+  { path: "/express/playwright", method: "GET", description: "测试 Playwright", category: "浏览器" },
+  { path: "/express/chrome-aws-lambda", method: "GET", description: "测试 Chrome AWS Lambda", category: "浏览器" },
+]
 
 export default function Home() {
-  const [apiResult, setApiResult] = useState<string>("")
-  const [isLoading, setIsLoading] = useState(false)
+  const [results, setResults] = useState<Record<string, { status: string; message: string }>>({})
+  const [loadingEndpoints, setLoadingEndpoints] = useState<Set<string>>(new Set())
 
-  const handleApiCall = async () => {
-    setIsLoading(true)
+  const handleApiCall = async (endpoint: ApiEndpoint) => {
+    const key = endpoint.path
+    setLoadingEndpoints(prev => new Set(prev).add(key))
+    
     try {
-      const response = await fetch("/express");
-      const data = await response.json();
-      setApiResult(data.message);
+      const response = await fetch(endpoint.path)
+      
+      if (response.headers.get('content-type')?.includes('image')) {
+        const blob = await response.blob()
+        const url = URL.createObjectURL(blob)
+        setResults(prev => ({
+          ...prev,
+          [key]: { status: 'success', message: `图片生成成功 (${blob.size} bytes)` }
+        }))
+      } else {
+        const data = await response.json()
+        setResults(prev => ({
+          ...prev,
+          [key]: { status: 'success', message: JSON.stringify(data, null, 2) }
+        }))
+      }
     } catch (error) {
-      setApiResult("Error: Failed to call API")
+      setResults(prev => ({
+        ...prev,
+        [key]: { status: 'error', message: error instanceof Error ? error.message : '未知错误' }
+      }))
     } finally {
-      setIsLoading(false)
+      setLoadingEndpoints(prev => {
+        const next = new Set(prev)
+        next.delete(key)
+        return next
+      })
     }
+  }
+
+  const categories = Array.from(new Set(API_ENDPOINTS.map(e => e.category)))
+
+  const getStatusIcon = (path: string) => {
+    const result = results[path]
+    const isLoading = loadingEndpoints.has(path)
+    
+    if (isLoading) {
+      return <Loader2 className="w-4 h-4 animate-spin text-blue-400" />
+    }
+    if (!result) return null
+    if (result.status === 'success') {
+      return <CheckCircle2 className="w-4 h-4 text-green-400" />
+    }
+    return <XCircle className="w-4 h-4 text-red-400" />
   }
 
   return (
@@ -62,14 +127,14 @@ export default function Home() {
 
       {/* Main Content */}
       <main className="container mx-auto px-6 py-16">
-        <div className="max-w-4xl mx-auto text-center space-y-8">
+        <div className="max-w-7xl mx-auto space-y-8">
           {/* Main Title */}
-          <div className="space-y-4">
+          <div className="space-y-4 text-center">
             <h1 className="text-5xl font-bold leading-tight">
-              Node Functions on EdgeOne Pages - Express
+              Binary Modules Test - Node Functions
             </h1>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
-              Node Functions allow you to run code in the Node Runtime without managing servers. With its capabilities, you can easily develop and deploy full-stack applications based on the Express framework on Pages.
+              测试各种二进制模块在 EdgeOne Pages Node Functions 中的运行情况
             </p>
           </div>
 
@@ -81,7 +146,7 @@ export default function Home() {
               className="bg-[#1c66e5] hover:bg-[#1c66e5]/90 text-white px-8 py-3 text-lg cursor-pointer"
             >
               <Zap className="w-5 h-5 mr-2" />
-              One-Click Deployment
+              一键部署
             </Button>
             </a>
             <a href="https://pages.edgeone.ai/document/node-functions" target="_blank" rel="noopener noreferrer">
@@ -91,64 +156,88 @@ export default function Home() {
               className="border-gray-600 hover:bg-gray-800 text-white px-8 py-3 text-lg cursor-pointer"
             >
               <ExternalLink className="w-5 h-5 mr-2" />
-              View Documentation
+              查看文档
             </Button>
             </a>
           </div>
 
-          {/* Code Block */}
-          <Card className="bg-gray-900 border-gray-700 text-left">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-mono text-gray-400">
-                ./node-functions/express/[[default]].js
-              </CardTitle>
+          {/* API Endpoints by Category */}
+          {categories.map(category => (
+            <div key={category} className="space-y-4">
+              <h2 className="text-2xl font-bold text-gray-100 border-b border-gray-700 pb-2">
+                {category}
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {API_ENDPOINTS.filter(e => e.category === category).map(endpoint => (
+                  <Card key={endpoint.path} className="bg-gray-900 border-gray-700 hover:border-gray-600 transition-colors">
+                    <CardContent className="p-4">
+                      <div className="space-y-3">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex-1 min-w-0">
+                            <h3 className="text-sm font-semibold text-white mb-1 truncate">
+                              {endpoint.description}
+                            </h3>
+                            <p className="text-xs text-gray-400 font-mono truncate">
+                              {endpoint.method} {endpoint.path}
+                            </p>
+                          </div>
+                          <div className="flex-shrink-0">
+                            {getStatusIcon(endpoint.path)}
+                          </div>
+                        </div>
+                        
+                        <Button
+                          onClick={() => handleApiCall(endpoint)}
+                          disabled={loadingEndpoints.has(endpoint.path)}
+                          size="sm"
+                          className="w-full bg-[#1c66e5] hover:bg-[#1c66e5]/90 text-white cursor-pointer"
+                        >
+                          {loadingEndpoints.has(endpoint.path) ? (
+                            <>
+                              <Loader2 className="w-3 h-3 mr-2 animate-spin" />
+                              测试中...
+                            </>
+                          ) : (
+                            <>
+                              <Play className="w-3 h-3 mr-2" />
+                              测试
+                            </>
+                          )}
+                        </Button>
+
+                        {results[endpoint.path] && (
+                          <div className={`text-xs p-2 rounded ${
+                            results[endpoint.path].status === 'success' 
+                              ? 'bg-green-900/20 text-green-300 border border-green-700/50' 
+                              : 'bg-red-900/20 text-red-300 border border-red-700/50'
+                          }`}>
+                            <pre className="whitespace-pre-wrap break-all max-h-32 overflow-y-auto">
+                              {results[endpoint.path].message}
+                            </pre>
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          ))}
+
+          {/* Info Card */}
+          <Card className="bg-gray-900 border-gray-700 mt-8">
+            <CardHeader>
+              <CardTitle className="text-lg">📦 已安装的二进制模块</CardTitle>
             </CardHeader>
             <CardContent>
-              <pre className="text-sm text-gray-200 font-mono leading-relaxed">
-{`import express from "express";
-const app = express();
-
-// Add logging middleware
-app.use((req, res, next) => {
-  console.log(\`[Log] $\{req.method} $\{req.url}\`);
-  next();
-});
-
-// Add root route handling
-app.get("/", (req, res) => {
-  res.json({ message: "Hello from Express on Node Functions!" });
-});
-
-// Export the handling function
-export default app;`}
-              </pre>
-            </CardContent>
-          </Card>
-
-          {/* API Call Section */}
-          <Card className="bg-gray-900 border-gray-700">
-            <CardContent className="pt-6">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <Button 
-                  onClick={handleApiCall}
-                  disabled={isLoading}
-                  className="bg-[#1c66e5] hover:bg-[#1c66e5]/90 text-white cursor-pointer"
-                >
-                  {isLoading ? (
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                  ) : (
-                    <Play className="w-4 h-4 mr-2" />
-                  )}
-                  Execute API Call
-                </Button>
-                {apiResult && (
-                  <div className="text-left">
-                    <p className="text-sm text-gray-400 mb-2">API Call Result:</p>
-                    <p className="text-green-400 font-mono bg-gray-800 px-3 py-2 rounded">
-                      {apiResult}
-                    </p>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 text-sm">
+                {['argon2', 'bcrypt', 'sqlite3', 'better-sqlite3', 'pg-native', 'skia-canvas', 
+                  'ffmpeg-static', 'onnxruntime-node', 'wink-nlp', '@tensorflow/tfjs-node', 
+                  'puppeteer', 'playwright', 'chrome-aws-lambda', 'sharp'].map(pkg => (
+                  <div key={pkg} className="bg-gray-800 px-3 py-2 rounded text-gray-300 font-mono text-xs">
+                    {pkg}
                   </div>
-                )}
+                ))}
               </div>
             </CardContent>
           </Card>
