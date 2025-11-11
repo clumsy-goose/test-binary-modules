@@ -11,7 +11,7 @@ const app = express();
 // import winkNLP from 'wink-nlp';
 // import model from 'wink-eng-lite-web-model';
 // import tf from '@tensorflow/tfjs-node';
-import puppeteer from 'puppeteer';
+// import puppeteer from 'puppeteer';
 // import { chromium } from 'playwright';
 // import playwright from 'playwright-core';
 
@@ -175,41 +175,41 @@ app.get('/better-sqlite3', async (req, res) => {
 //
 // });
 
-// app.get('/ffmpeg-static', async (req, res) => {
+app.get('/ffmpeg-static', async (req, res) => {
 
-//   const pathToFfmpeg = require('ffmpeg-static');
-//   const { spawn } = require('child_process');
+  const pathToFfmpeg = require('ffmpeg-static');
+  const { spawn } = require('child_process');
 
-//   // Define input and output file paths
-//   const inputFile = 'input.mp3'; // Replace with your input audio file
-//   const outputFile = 'output.wav'; // Desired output file
+  // Define input and output file paths
+  const inputFile = 'input.mp3'; // Replace with your input audio file
+  const outputFile = 'output.wav'; // Desired output file
 
-//   // FFmpeg command arguments
-//   const ffmpegArgs = [
-//     '-i', inputFile,
-//     outputFile
-//   ];
-//   console.log('path', pathToFfmpeg);
+  // FFmpeg command arguments
+  const ffmpegArgs = [
+    '-i', inputFile,
+    outputFile
+  ];
+  console.log('path', pathToFfmpeg);
 
-//   // Spawn the FFmpeg process
-//   const ffmpegProcess = spawn(pathToFfmpeg, ['-version']);
-//   console.log(ffmpegProcess.stdout);
+  // Spawn the FFmpeg process
+  const ffmpegProcess = spawn(pathToFfmpeg, ['-version']);
+  console.log(ffmpegProcess.stdout);
 
-//   ffmpegProcess.on('close', (code) => {
-//     if (code === 0) {
-//       console.log(`FFmpeg process exited successfully. `);
-//     } else {
-//       console.error(`FFmpeg process exited with error code ${code}`);
-//     }
-//     res.send('done');
-//   });
+  ffmpegProcess.on('close', (code) => {
+    if (code === 0) {
+      console.log(`FFmpeg process exited successfully. `);
+    } else {
+      console.error(`FFmpeg process exited with error code ${code}`);
+    }
+    res.send('done');
+  });
 
-//   ffmpegProcess.on('error', (err) => {
-//     console.error(err.stack);
-//     console.error(`Failed to start FFmpeg process: ${err}`);
-//   });
+  ffmpegProcess.on('error', (err) => {
+    console.error(err.stack);
+    console.error(`Failed to start FFmpeg process: ${err}`);
+  });
 
-// });
+});
 
 
 // app.get('/onnxruntime', async (req, res) => {
@@ -302,16 +302,16 @@ app.get('/better-sqlite3', async (req, res) => {
 
 // });
 
-app.get('/puppeteer', async (req, res) => {
-  const puppeteer = require('puppeteer');
-  const browser = await puppeteer.launch();
-  const page = await browser.newPage();
-  await page.goto('https://baidu.com');
-  await page.screenshot({ path: './screen.png' });
-  await browser.close(); // Close the browser
-  res.send('ok');
+// app.get('/puppeteer', async (req, res) => {
+//   const puppeteer = require('puppeteer');
+//   const browser = await puppeteer.launch();
+//   const page = await browser.newPage();
+//   await page.goto('https://baidu.com');
+//   await page.screenshot({ path: './screen.png' });
+//   await browser.close(); // Close the browser
+//   res.send('ok');
 
-});
+// });
 
 // todo 测试失败
 // app.get('/playwright', async (req, res) => {
