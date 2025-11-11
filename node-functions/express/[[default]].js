@@ -252,21 +252,21 @@ app.get('/ffmpeg-static', async (req, res) => {
 
 // });
 
-app.get('/winknlp', async (req, res) => {
-  const winkNLP = require('wink-nlp');
-  const model = require( 'wink-eng-lite-web-model' );
-  const nlp = winkNLP( model );
-  // Obtain "its" helper to extract item properties.
-  const its = nlp.its;
-  // Obtain "as" reducer helper to reduce a collection.
-  const as = nlp.as;
-  const text = 'Hello   World🌎! How are you?';
-  const doc = nlp.readDoc( text );
-  console.log( doc.tokens().out() );
+// app.get('/winknlp', async (req, res) => {
+//   const winkNLP = require('wink-nlp');
+//   const model = require( 'wink-eng-lite-web-model' );
+//   const nlp = winkNLP( model );
+//   // Obtain "its" helper to extract item properties.
+//   const its = nlp.its;
+//   // Obtain "as" reducer helper to reduce a collection.
+//   const as = nlp.as;
+//   const text = 'Hello   World🌎! How are you?';
+//   const doc = nlp.readDoc( text );
+//   console.log( doc.tokens().out() );
 
-  res.send('ok');
+//   res.send('ok');
 
-});
+// });
 
 
 // app.get('/tensorflow', async (req, res) => {
