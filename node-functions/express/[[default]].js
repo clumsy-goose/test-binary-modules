@@ -1,8 +1,8 @@
 import express from "express";
 import path from "path";
 const app = express();
-import argon2 from "argon2";
-import bcrypt from "bcrypt";
+// import argon2 from "argon2";
+// import bcrypt from "bcrypt";
 // import fs from "fs";
 // import { Canvas } from 'skia-canvas';
 // import pathToFfmpeg from 'ffmpeg-static';
@@ -45,118 +45,118 @@ app.get("/context", (req, res) => {
   res.json({ message: "Express [express 路由匹配测试] context:" + JSON.stringify(req.context) });
 })
 
-app.get('/argon2', async (req, res) => {
-  // 注意, 如果顶层使用了import这里就不能用require
-  // 如果这里用require的方式, 顶层就不能用import
-  //const argon2 = require('argon2');
-  const password = 'myPassword123';
+// app.get('/argon2', async (req, res) => {
+//   // 注意, 如果顶层使用了import这里就不能用require
+//   // 如果这里用require的方式, 顶层就不能用import
+//   //const argon2 = require('argon2');
+//   const password = 'myPassword123';
   
-  const hash = await argon2.hash(password);
-  res.json({ result : hash });
+//   const hash = await argon2.hash(password);
+//   res.json({ result : hash });
+// });
+
+
+// app.get('/bcrypt', async (req, res) => {
+//   // https://www.npmjs.com/package/bcrypt
+//   const saltRounds = 10;
+//   const myPlaintextPassword = 's0/\/\P4$$w0rD';
+//   const hash = await bcrypt.hash(myPlaintextPassword, saltRounds);
+//   res.json({ result : hash });
+// });
+
+app.get('/scrypt', async (req, res) => {
+  const scrypt = require("scrypt");
+  const key = new Buffer("");
+  const result = scrypt.hashSync(key,{"N":16,"r":1,"p":1},64,"").toString("hex");
+  console.log(result);
+  res.json({ result : result });
 });
 
+// app.get('/sqlite3', async (req, res) => {
+//   const sqlite3 = require('sqlite3').verbose();
+//   const db = new sqlite3.Database(':memory:');
 
-app.get('/bcrypt', async (req, res) => {
-  // https://www.npmjs.com/package/bcrypt
-  const saltRounds = 10;
-  const myPlaintextPassword = 's0/\/\P4$$w0rD';
-  const hash = await bcrypt.hash(myPlaintextPassword, saltRounds);
-  res.json({ result : hash });
+//   db.serialize(() => {
+//     db.run("CREATE TABLE lorem (info TEXT)");
+
+//     const stmt = db.prepare("INSERT INTO lorem VALUES (?)");
+//     for (let i = 0; i < 2; i++) {
+//       stmt.run("Ipsum " + i);
+//     }
+//     stmt.finalize();
+
+//     db.each("SELECT rowid AS id, info FROM lorem", (err, row) => {
+//       console.log(row.id + ": " + row.info);
+//     });
+
+//     res.json({ result : "ok" });
+
+//   });
+
+//   db.close();
+
+// });
+
+app.get('/better-sqlite3', async (req, res) => {
+
+  const Database = require('better-sqlite3');
+  const db = new Database('my_database.db');
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      email TEXT UNIQUE NOT NULL
+    );
+  `);
+  // Insert data into the table
+  const insert = db.prepare('INSERT INTO users (name, email) VALUES (?, ?)');
+  insert.run('Alice', 'alice@example.com');
+  insert.run('Bob', 'bob@example.com');
+  console.log('Data inserted into "users" table.');
+  // Query data from the table
+  const selectAll = db.prepare('SELECT * FROM users');
+  const users = selectAll.all();
+  console.log('All users:');
+  console.log(users);
+  res.json({ result : "ok" });
+
 });
 
-// app.get('/scrypt', async (req, res) => {
-//   const scrypt = require("scrypt");
-//   const key = new Buffer("");
-//   const result = scrypt.hashSync(key,{"N":16,"r":1,"p":1},64,"").toString("hex");
-//   console.log(result);
-//   res.json({ result : result });
-// });
+app.get('/pg-native', async (req, res) => {
 
-app.get('/sqlite3', async (req, res) => {
-  const sqlite3 = require('sqlite3').verbose();
-  const db = new sqlite3.Database(':memory:');
-
-  db.serialize(() => {
-    db.run("CREATE TABLE lorem (info TEXT)");
-
-    const stmt = db.prepare("INSERT INTO lorem VALUES (?)");
-    for (let i = 0; i < 2; i++) {
-      stmt.run("Ipsum " + i);
-    }
-    stmt.finalize();
-
-    db.each("SELECT rowid AS id, info FROM lorem", (err, row) => {
-      console.log(row.id + ": " + row.info);
-    });
-
-    res.json({ result : "ok" });
-
-  });
-
-  db.close();
+  const Client = require('pg-native')
+  const config = {
+    user: 'admin',
+    password: 'Admin1111#',
+    host: 'gz-postgres-j5ppvt2b.sql.tencentcdb.com',
+    port: 26227,
+    database: 'test1'
+  };
+  const client = new Client();
+  client.connectSync(`postgresql://${config.user}:${config.password}@${config.host}:${config.port}/${config.database}`);
+  console.log(client);
+  res.json({ result : "ok" });
 
 });
 
-// app.get('/better-sqlite3', async (req, res) => {
+app.get('/skia-canvas', async (req, res) => {
 
-//   const Database = require('better-sqlite3');
-//   const db = new Database('my_database.db');
-//   db.exec(`
-//     CREATE TABLE IF NOT EXISTS users (
-//       id INTEGER PRIMARY KEY AUTOINCREMENT,
-//       name TEXT NOT NULL,
-//       email TEXT UNIQUE NOT NULL
-//     );
-//   `);
-//   // Insert data into the table
-//   const insert = db.prepare('INSERT INTO users (name, email) VALUES (?, ?)');
-//   insert.run('Alice', 'alice@example.com');
-//   insert.run('Bob', 'bob@example.com');
-//   console.log('Data inserted into "users" table.');
-//   // Query data from the table
-//   const selectAll = db.prepare('SELECT * FROM users');
-//   const users = selectAll.all();
-//   console.log('All users:');
-//   console.log(users);
-//   res.json({ result : "ok" });
+  const { Canvas, Image } = require('skia-canvas');
+  const canvas = new Canvas(300, 200);
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = 'blue';
+  ctx.fillRect(10, 10, 100, 100);
 
-// });
+  try {
+    const buffer = await canvas.toBuffer('png');
+    res.set('Content-Type', 'image/png');
+    res.send(buffer);
+  } catch (error) {
+    console.error('Error generating image:', error);
+    res.status(500).send('Error generating image');
+  }
 
-// app.get('/pg-native', async (req, res) => {
-
-//   const Client = require('pg-native')
-//   const config = {
-//     user: 'admin',
-//     password: 'Admin1111#',
-//     host: 'gz-postgres-j5ppvt2b.sql.tencentcdb.com',
-//     port: 26227,
-//     database: 'test1'
-//   };
-//   const client = new Client();
-//   client.connectSync(`postgresql://${config.user}:${config.password}@${config.host}:${config.port}/${config.database}`);
-//   console.log(client);
-//   res.json({ result : "ok" });
-
-// });
-
-// app.get('/skia-canvas', async (req, res) => {
-
-//   const { Canvas, Image } = require('skia-canvas');
-//   const canvas = new Canvas(300, 200);
-//   const ctx = canvas.getContext('2d');
-//   ctx.fillStyle = 'blue';
-//   ctx.fillRect(10, 10, 100, 100);
-
-//   try {
-//     const buffer = await canvas.toBuffer('png');
-//     res.set('Content-Type', 'image/png');
-//     res.send(buffer);
-//   } catch (error) {
-//     console.error('Error generating image:', error);
-//     res.status(500).send('Error generating image');
-//   }
-
-// });
+});
 
 // 测试失败
 // app.get('/opencv', async (req, res) => {
