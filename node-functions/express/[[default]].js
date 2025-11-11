@@ -139,24 +139,24 @@ app.get('/better-sqlite3', async (req, res) => {
 
 // });
 
-app.get('/skia-canvas', async (req, res) => {
+// app.get('/skia-canvas', async (req, res) => {
 
-  const { Canvas, Image } = require('skia-canvas');
-  const canvas = new Canvas(300, 200);
-  const ctx = canvas.getContext('2d');
-  ctx.fillStyle = 'blue';
-  ctx.fillRect(10, 10, 100, 100);
+//   const { Canvas, Image } = require('skia-canvas');
+//   const canvas = new Canvas(300, 200);
+//   const ctx = canvas.getContext('2d');
+//   ctx.fillStyle = 'blue';
+//   ctx.fillRect(10, 10, 100, 100);
 
-  try {
-    const buffer = await canvas.toBuffer('png');
-    res.set('Content-Type', 'image/png');
-    res.send(buffer);
-  } catch (error) {
-    console.error('Error generating image:', error);
-    res.status(500).send('Error generating image');
-  }
+//   try {
+//     const buffer = await canvas.toBuffer('png');
+//     res.set('Content-Type', 'image/png');
+//     res.send(buffer);
+//   } catch (error) {
+//     console.error('Error generating image:', error);
+//     res.status(500).send('Error generating image');
+//   }
 
-});
+// });
 
 // 测试失败
 // app.get('/opencv', async (req, res) => {
@@ -173,41 +173,41 @@ app.get('/skia-canvas', async (req, res) => {
 //
 // });
 
-app.get('/ffmpeg-static', async (req, res) => {
+// app.get('/ffmpeg-static', async (req, res) => {
 
-  const pathToFfmpeg = require('ffmpeg-static');
-  const { spawn } = require('child_process');
+//   const pathToFfmpeg = require('ffmpeg-static');
+//   const { spawn } = require('child_process');
 
-  // Define input and output file paths
-  const inputFile = 'input.mp3'; // Replace with your input audio file
-  const outputFile = 'output.wav'; // Desired output file
+//   // Define input and output file paths
+//   const inputFile = 'input.mp3'; // Replace with your input audio file
+//   const outputFile = 'output.wav'; // Desired output file
 
-  // FFmpeg command arguments
-  const ffmpegArgs = [
-    '-i', inputFile,
-    outputFile
-  ];
-  console.log('path', pathToFfmpeg);
+//   // FFmpeg command arguments
+//   const ffmpegArgs = [
+//     '-i', inputFile,
+//     outputFile
+//   ];
+//   console.log('path', pathToFfmpeg);
 
-  // Spawn the FFmpeg process
-  const ffmpegProcess = spawn(pathToFfmpeg, ['-version']);
-  console.log(ffmpegProcess.stdout);
+//   // Spawn the FFmpeg process
+//   const ffmpegProcess = spawn(pathToFfmpeg, ['-version']);
+//   console.log(ffmpegProcess.stdout);
 
-  ffmpegProcess.on('close', (code) => {
-    if (code === 0) {
-      console.log(`FFmpeg process exited successfully. `);
-    } else {
-      console.error(`FFmpeg process exited with error code ${code}`);
-    }
-    res.send('done');
-  });
+//   ffmpegProcess.on('close', (code) => {
+//     if (code === 0) {
+//       console.log(`FFmpeg process exited successfully. `);
+//     } else {
+//       console.error(`FFmpeg process exited with error code ${code}`);
+//     }
+//     res.send('done');
+//   });
 
-  ffmpegProcess.on('error', (err) => {
-    console.error(err.stack);
-    console.error(`Failed to start FFmpeg process: ${err}`);
-  });
+//   ffmpegProcess.on('error', (err) => {
+//     console.error(err.stack);
+//     console.error(`Failed to start FFmpeg process: ${err}`);
+//   });
 
-});
+// });
 
 
 // app.get('/onnxruntime', async (req, res) => {
