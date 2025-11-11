@@ -98,9 +98,11 @@ app.get('/sqlite3', async (req, res) => {
 });
 
 app.get('/better-sqlite3', async (req, res) => {
+  console.log(req);
 
   const Database = require('better-sqlite3');
-  const db = new Database('my_database.db');
+  // 使用内存数据库，每次请求都是全新的数据库
+  const db = new Database(':memory:');
   db.exec(`
     CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
