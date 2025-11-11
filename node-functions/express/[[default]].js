@@ -11,7 +11,7 @@ const app = express();
 // import winkNLP from 'wink-nlp';
 // import model from 'wink-eng-lite-web-model';
 // import tf from '@tensorflow/tfjs-node';
-// import puppeteer from 'puppeteer';
+import puppeteer from 'puppeteer';
 // import { chromium } from 'playwright';
 // import playwright from 'playwright-core';
 
@@ -64,38 +64,38 @@ app.get("/context", (req, res) => {
 //   res.json({ result : hash });
 // });
 
-app.get('/scrypt', async (req, res) => {
-  const scrypt = require("scrypt");
-  const key = new Buffer("");
-  const result = scrypt.hashSync(key,{"N":16,"r":1,"p":1},64,"").toString("hex");
-  console.log(result);
-  res.json({ result : result });
-});
-
-// app.get('/sqlite3', async (req, res) => {
-//   const sqlite3 = require('sqlite3').verbose();
-//   const db = new sqlite3.Database(':memory:');
-
-//   db.serialize(() => {
-//     db.run("CREATE TABLE lorem (info TEXT)");
-
-//     const stmt = db.prepare("INSERT INTO lorem VALUES (?)");
-//     for (let i = 0; i < 2; i++) {
-//       stmt.run("Ipsum " + i);
-//     }
-//     stmt.finalize();
-
-//     db.each("SELECT rowid AS id, info FROM lorem", (err, row) => {
-//       console.log(row.id + ": " + row.info);
-//     });
-
-//     res.json({ result : "ok" });
-
-//   });
-
-//   db.close();
-
+// app.get('/scrypt', async (req, res) => {
+//   const scrypt = require("scrypt");
+//   const key = new Buffer("");
+//   const result = scrypt.hashSync(key,{"N":16,"r":1,"p":1},64,"").toString("hex");
+//   console.log(result);
+//   res.json({ result : result });
 // });
+
+app.get('/sqlite3', async (req, res) => {
+  const sqlite3 = require('sqlite3').verbose();
+  const db = new sqlite3.Database(':memory:');
+
+  db.serialize(() => {
+    db.run("CREATE TABLE lorem (info TEXT)");
+
+    const stmt = db.prepare("INSERT INTO lorem VALUES (?)");
+    for (let i = 0; i < 2; i++) {
+      stmt.run("Ipsum " + i);
+    }
+    stmt.finalize();
+
+    db.each("SELECT rowid AS id, info FROM lorem", (err, row) => {
+      console.log(row.id + ": " + row.info);
+    });
+
+    res.json({ result : "ok" });
+
+  });
+
+  db.close();
+
+});
 
 app.get('/better-sqlite3', async (req, res) => {
 
@@ -122,22 +122,22 @@ app.get('/better-sqlite3', async (req, res) => {
 
 });
 
-app.get('/pg-native', async (req, res) => {
+// app.get('/pg-native', async (req, res) => {
 
-  const Client = require('pg-native')
-  const config = {
-    user: 'admin',
-    password: 'Admin1111#',
-    host: 'gz-postgres-j5ppvt2b.sql.tencentcdb.com',
-    port: 26227,
-    database: 'test1'
-  };
-  const client = new Client();
-  client.connectSync(`postgresql://${config.user}:${config.password}@${config.host}:${config.port}/${config.database}`);
-  console.log(client);
-  res.json({ result : "ok" });
+//   const Client = require('pg-native')
+//   const config = {
+//     user: 'admin',
+//     password: 'Admin1111#',
+//     host: 'gz-postgres-j5ppvt2b.sql.tencentcdb.com',
+//     port: 26227,
+//     database: 'test1'
+//   };
+//   const client = new Client();
+//   client.connectSync(`postgresql://${config.user}:${config.password}@${config.host}:${config.port}/${config.database}`);
+//   console.log(client);
+//   res.json({ result : "ok" });
 
-});
+// });
 
 app.get('/skia-canvas', async (req, res) => {
 
@@ -173,41 +173,41 @@ app.get('/skia-canvas', async (req, res) => {
 //
 // });
 
-// app.get('/ffmpeg-static', async (req, res) => {
+app.get('/ffmpeg-static', async (req, res) => {
 
-//   const pathToFfmpeg = require('ffmpeg-static');
-//   const { spawn } = require('child_process');
+  const pathToFfmpeg = require('ffmpeg-static');
+  const { spawn } = require('child_process');
 
-//   // Define input and output file paths
-//   const inputFile = 'input.mp3'; // Replace with your input audio file
-//   const outputFile = 'output.wav'; // Desired output file
+  // Define input and output file paths
+  const inputFile = 'input.mp3'; // Replace with your input audio file
+  const outputFile = 'output.wav'; // Desired output file
 
-//   // FFmpeg command arguments
-//   const ffmpegArgs = [
-//     '-i', inputFile,
-//     outputFile
-//   ];
-//   console.log('path', pathToFfmpeg);
+  // FFmpeg command arguments
+  const ffmpegArgs = [
+    '-i', inputFile,
+    outputFile
+  ];
+  console.log('path', pathToFfmpeg);
 
-//   // Spawn the FFmpeg process
-//   const ffmpegProcess = spawn(pathToFfmpeg, ['-version']);
-//   console.log(ffmpegProcess.stdout);
+  // Spawn the FFmpeg process
+  const ffmpegProcess = spawn(pathToFfmpeg, ['-version']);
+  console.log(ffmpegProcess.stdout);
 
-//   ffmpegProcess.on('close', (code) => {
-//     if (code === 0) {
-//       console.log(`FFmpeg process exited successfully. `);
-//     } else {
-//       console.error(`FFmpeg process exited with error code ${code}`);
-//     }
-//     res.send('done');
-//   });
+  ffmpegProcess.on('close', (code) => {
+    if (code === 0) {
+      console.log(`FFmpeg process exited successfully. `);
+    } else {
+      console.error(`FFmpeg process exited with error code ${code}`);
+    }
+    res.send('done');
+  });
 
-//   ffmpegProcess.on('error', (err) => {
-//     console.error(err.stack);
-//     console.error(`Failed to start FFmpeg process: ${err}`);
-//   });
+  ffmpegProcess.on('error', (err) => {
+    console.error(err.stack);
+    console.error(`Failed to start FFmpeg process: ${err}`);
+  });
 
-// });
+});
 
 
 // app.get('/onnxruntime', async (req, res) => {
@@ -252,21 +252,21 @@ app.get('/skia-canvas', async (req, res) => {
 
 // });
 
-// app.get('/winknlp', async (req, res) => {
-//   const winkNLP = require('wink-nlp');
-//   const model = require( 'wink-eng-lite-web-model' );
-//   const nlp = winkNLP( model );
-//   // Obtain "its" helper to extract item properties.
-//   const its = nlp.its;
-//   // Obtain "as" reducer helper to reduce a collection.
-//   const as = nlp.as;
-//   const text = 'Hello   World🌎! How are you?';
-//   const doc = nlp.readDoc( text );
-//   console.log( doc.tokens().out() );
+app.get('/winknlp', async (req, res) => {
+  const winkNLP = require('wink-nlp');
+  const model = require( 'wink-eng-lite-web-model' );
+  const nlp = winkNLP( model );
+  // Obtain "its" helper to extract item properties.
+  const its = nlp.its;
+  // Obtain "as" reducer helper to reduce a collection.
+  const as = nlp.as;
+  const text = 'Hello   World🌎! How are you?';
+  const doc = nlp.readDoc( text );
+  console.log( doc.tokens().out() );
 
-//   res.send('ok');
+  res.send('ok');
 
-// });
+});
 
 
 // app.get('/tensorflow', async (req, res) => {
@@ -300,16 +300,16 @@ app.get('/skia-canvas', async (req, res) => {
 
 // });
 
-// app.get('/puppeteer', async (req, res) => {
-//   const puppeteer = require('puppeteer');
-//   const browser = await puppeteer.launch();
-//   const page = await browser.newPage();
-//   await page.goto('https://baidu.com');
-//   await page.screenshot({ path: './screen.png' });
-//   await browser.close(); // Close the browser
-//   res.send('ok');
+app.get('/puppeteer', async (req, res) => {
+  const puppeteer = require('puppeteer');
+  const browser = await puppeteer.launch();
+  const page = await browser.newPage();
+  await page.goto('https://baidu.com');
+  await page.screenshot({ path: './screen.png' });
+  await browser.close(); // Close the browser
+  res.send('ok');
 
-// });
+});
 
 // todo 测试失败
 // app.get('/playwright', async (req, res) => {
